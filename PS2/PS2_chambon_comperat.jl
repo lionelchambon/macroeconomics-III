@@ -1,3 +1,5 @@
+#squalala nous sommes partis
+
 #### Problem Set 2 - Markov chain process
 using Distributions, LinearAlgebra
 

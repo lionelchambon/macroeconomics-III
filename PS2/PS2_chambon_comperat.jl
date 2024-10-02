@@ -74,7 +74,7 @@ function get_invdist(first_guess, P)
 end
 
 
-first_guess = rand(num_states) / sum(first_guess)
+first_guess = [0, 0, 1, 0, 0]
 
 invdist = get_invdist(first_guess, Pi)
 
@@ -84,7 +84,7 @@ println(invdist)
 
 ## What is the mean income? 
 
-expected_y = sum(invdist .* inc)
+expected_y = sum(invdist .* inc')
 println("The expected income is $expected_y.")
 
 ## What is the share of households with income y_5?
@@ -116,9 +116,9 @@ println(P6)
 
 ### Q2
 
-first_guess = rand(3) / sum(first_guess) # Adjusting for the number of states
+first_guess_2 = [1, 0, 0]
 
-invdist_2 = get_invdist(first_guess, P)
+invdist_2 = get_invdist(first_guess_2, P)
 println(invdist_2)
 println(invdist_2[3])
 

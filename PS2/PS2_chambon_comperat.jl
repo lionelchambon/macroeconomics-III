@@ -108,11 +108,11 @@ P = [0.971 0.029 0.000
 
 ## In t+6? 
 
-P6 = P.^6 
+P6 = P^6 
 println(P6)
 
 # First, we raise the stochastic matrix to the power of 6. Then, by using the same computation as before,
-# we find the probability of being in a recession in 6 months to be ~0.16187.
+# we find the probability of being in a recession in 6 months to be ~0.12%.
 
 ### Q2
 

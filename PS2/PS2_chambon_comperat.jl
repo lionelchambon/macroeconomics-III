@@ -39,7 +39,7 @@ end
 # Parameters value
 
 rho = 0.8
-sigma = 0.1225
+sigma = sqrt(0.1225)
 num_states = 5;
 N_iter = 2000;
 

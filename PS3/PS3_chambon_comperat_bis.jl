@@ -71,12 +71,15 @@ end
 
 ################ WITH CREDIT CONSTRAINT ##############################################################################
 
-a_opt_bis = copy(a_opt);
+a_opt_bis = copy(a_opt)
+
+binding = findall(x -> x < -b, a_opt_bis)
+binding_set = Set(binding)
 
 for iy1 in 1:Ny
     for iy2 in 1:Ny
 
-        if a_opt_bis[iy1, iy2] < -b
+        if (iy1, iy2) in binding_set
  
             a_opt_bis[iy1, iy2] = -b
 
@@ -108,7 +111,3 @@ plot!(grid_y,a_opt_bis[:,40],title="Value Function", label="With credit constrai
 
 plot(grid_y,v_opt[:,40],title="Asset Policy Function", label="No credit constraint")
 plot!(grid_y,v_opt_bis[:,40],title="Asset Policy Function", label="With credit constraint")
-
-# Problem: If I use the findall function, then my plots come out identical for both the unconstrained and 
-# constrained case. My guess is that if I use findall to isolate the indices where the constraint binds,
-# Julia then compares the values to the indices, which is an illogical argument?

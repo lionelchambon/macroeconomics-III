@@ -55,23 +55,24 @@ sgrid = exp.(logs);
 U = zeros(Ns,Na,Na)
 
 ###### TO FILL ############################################################################################################
-# for is in 1:Ns                     # Loop Over skills Today
-#     for ia in 1:Na                 # Loop Over assets Today
-#         for ia_p in 1:Na           # Loop Over assets Tomorrow
-#                  # Technology Today
-#                  # Capital Today
-#                 # Capital Tomorrow
-#             # Solve for Consumption at Each Point
-#             if c .< 0
-#                 # If Tomorrow"s Capital Stock | Today"s Consumption is Negative
-#                 # Numerical Trick to ensure that the Value Function is never
-#                 # optimised at these pointselse
-#             else()
-#                 # Calculate Utility at this Point on Grid
-#             end
-#         end
-#     end
-# end
+ for is in 1:Ns                     # Loop Over skills Today
+     for ia in 1:Na                 # Loop Over assets Today
+         for ia_p in 1:Na           # Loop Over assets Tomorrow
+
+             c = sgrid[is] * w + (1 +r) * agrid[ia] - agrid[ia_p] 
+
+             if c .< 0 || agrid[ia_p] < b
+                 
+                  U[is, ia, ia_p] = -1e10
+
+             else()
+                 
+                  U[is, ia, ia_p] = (c^(1 - mu) - 1) / (1 - mu)
+
+             end
+         end
+     end
+ end
 ##################################################################################################################
 
 
@@ -80,43 +81,64 @@ U = zeros(Ns,Na,Na)
 #Initial Guess of the Value Function
 V0 = zeros(Ns,Na);
 
-#Second upgraded initial guess 
+#Second upgraded initial guess under a = a'
 ###### TO FILL ############################################################################################################
+
+
+for is in 1:Ns
+    for ia in 1:Na
+        c = sgrid[is] * w + (1 + r) * agrid[ia] - agrid[ia]  
+        if c > 0
+            V0[is, ia] = (c^(1 - mu) - 1) / (1 - mu)  
+        else
+            V0[is, ia] = -1e10  
+        end
+    end
+end
+Vguess = copy(V0)
+
 ##################################################################################################################
-
 #Calculate the Guess of the Expected Value Function
-
 
 tol = 1e-4;
 its = 0;
 maxits = 3000; # Define the maximum number of iterations
-Vnew = copy(V0);  # The new value function I obtain after an iteration
-Vguess = copy(V0);  # the  value function from which I start in each new iteration
+Vnew = copy(Vguess);  # The new value function I obtain after an iteration
+# Vguess = copy(V0);  # the  value function from which I start in each new iteration / Commenting this line since we define a new Vguess
 policy_a_index = Array{Int64,2}(undef,Ns,Na);
 tv = zeros(Na)
 
 ###### TO FILL ############################################################################################################
-# for iter in 1:maxits
-#     for is in 1:Ns                     # Loop Over skills Today
-#         for ia in 1:Na                 # Loop Over assets Today
-#             # Compute tv 
-#             # findmax 
-#         end
-#     end
-#     if maximum(abs,Vguess.-Vnew) < tol
-#         println("Found solution after $iter iterations")
-#     return nothing
-#     elseif iter==maxits
-#         println("No solution found after $iter iterations")
-#     return nothing
-#     end
-#     # compute the error 
-#     # update guess 
-#     println("#iter = $iter, εᵥ = $err")
-# end
+ for iter in 1:maxits
+     for is in 1:Ns                     # Loop Over skills Today
+         for ia in 1:Na                 # Loop Over assets Today
+          for ia_p in 1:Na
+
+          EV = sum(prob[is, :] .* Vguess[:, ia_p])
+          tv[ia_p] = U[is, ia, ia_p] + beta * EV
+
+          end
+
+         Vnew[is, ia], policy_a_index[is, ia] = findmax(tv)
+
+     end
+    end
+
+     if maximum(abs,Vguess.-Vnew) < tol
+         println("Found solution after $iter iterations")
+     return nothing
+     elseif iter==maxits
+         println("No solution found after $iter iterations")
+     return nothing
+     end
+     err = maximum(abs,Vguess.-Vnew)
+     global Vguess = copy(Vnew)
+     println("#iter = $iter, εᵥ = $err")
+ end
 ##################################################################################################################
 
-
+# Found solution after 133 iterations using the initial guess.
+# Found solution after 131 iterations using improved guess a=a'.
 
 
 ##Policy function for assets
@@ -130,7 +152,13 @@ end
 ##Policy function for consumption
 policy_c = Array{Float64,2}(undef,Ns,Na) 
 ###### TO FILL ############################################################################################################
-# Recover policy function for consumption 
+
+for is in 1:Ns
+  for ia in 1:Na
+      policy_c[is, ia] = sgrid[is] * w + (1 + r) * agrid[ia] - policy_a[is, ia]
+  end
+end
+
 ##################################################################################################################
 
 

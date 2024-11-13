@@ -81,7 +81,7 @@ U = zeros(Ns,Na,Na)
 #Initial Guess of the Value Function
 V0 = zeros(Ns,Na);
 
-#Second upgraded initial guess under a = a'
+#Second upgraded initial guess under a = a'. This block can be commented to compare with original vector of zeros.
 ###### TO FILL ############################################################################################################
 
 
@@ -104,7 +104,7 @@ tol = 1e-4;
 its = 0;
 maxits = 3000; # Define the maximum number of iterations
 Vnew = copy(Vguess);  # The new value function I obtain after an iteration
-# Vguess = copy(V0);  # the  value function from which I start in each new iteration / Commenting this line since we define a new Vguess
+Vguess = copy(V0);  # the  value function from which I start in each new iteration 
 policy_a_index = Array{Int64,2}(undef,Ns,Na);
 tv = zeros(Na)
 
@@ -164,6 +164,11 @@ end
 
 ##Plotting the results
 using Plots
-plot(agrid,Vnew[:,:]')
-plot(agrid,policy_c[:,:]')
-plot(agrid,policy_a[:,:]')
+vplot = plot(agrid, Vnew[:,:]', label="Value Function", xlabel="Assets (a)", ylabel="Value (V)", title="Value Function V(a, s)")
+display(vplot)
+
+aplot = plot(agrid, policy_a[:,:]', label="Policy for Assets", xlabel="Assets (a)", ylabel="Assets Tomorrow (a')", title="Policy Function for Assets")
+display(aplot)
+
+cplot = plot(agrid, policy_c[:,:]', label="Policy for Consumption", xlabel="Assets (a)", ylabel="Consumption (c)", title="Policy Function for Consumption")
+display(cplot)

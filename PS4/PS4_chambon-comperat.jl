@@ -61,7 +61,7 @@ U = zeros(Ns,Na,Na)
 
              c = sgrid[is] * w + (1 +r) * agrid[ia] - agrid[ia_p] 
 
-             if c .< 0 || agrid[ia_p] < b
+             if c .< 0 
                  
                   U[is, ia, ia_p] = -1e10
 
@@ -81,21 +81,32 @@ U = zeros(Ns,Na,Na)
 #Initial Guess of the Value Function
 V0 = zeros(Ns,Na);
 
-#Second upgraded initial guess under a = a'. This block can be commented to compare with original vector of zeros.
+#Second upgraded initial guess under a = a'. 
 ###### TO FILL ############################################################################################################
 
+#Using what we discussed in class, but this increased my number of iterations to 136 instead of reducing it...
 
+V0_alt = zeros(Ns, Na)
+for is in 1:Ns
+    for ia in 1:Na
+        V0_alt[is, ia] = (1/(1-beta))*U[is, ia, ia]
+    end
+end
+
+#Trying another guess:
+
+V0_bis = zeros(Ns, Na)
 for is in 1:Ns
     for ia in 1:Na
         c = sgrid[is] * w + (1 + r) * agrid[ia] - agrid[ia]  
         if c > 0
-            V0[is, ia] = (c^(1 - mu) - 1) / (1 - mu)  
+            V0_bis[is, ia] = (c^(1 - mu) - 1) / (1 - mu)  
         else
-            V0[is, ia] = -1e10  
+            V0_bis[is, ia] = -1e10  
         end
     end
 end
-Vguess = copy(V0)
+Vguess = copy(V0_bis)
 
 ##################################################################################################################
 #Calculate the Guess of the Expected Value Function
@@ -104,7 +115,7 @@ tol = 1e-4;
 its = 0;
 maxits = 3000; # Define the maximum number of iterations
 Vnew = copy(Vguess);  # The new value function I obtain after an iteration
-Vguess = copy(V0);  # the  value function from which I start in each new iteration 
+Vguess = copy(V0_alt);  # the  value function from which I start in each new iteration. Replace V0 with V0_alt or V0_bis to compare
 policy_a_index = Array{Int64,2}(undef,Ns,Na);
 tv = zeros(Na)
 
@@ -138,7 +149,8 @@ tv = zeros(Na)
 ##################################################################################################################
 
 # Found solution after 133 iterations using the initial guess.
-# Found solution after 131 iterations using improved guess a=a'.
+# Found solution after 136 iterations using improved guess a=a'.
+# Found solution after 131 iterations when scrapping the division by 1-beta.
 
 
 ##Policy function for assets

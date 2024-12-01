@@ -189,7 +189,7 @@ aiyagari = function(r, par, agrid, sgrid, prob, Vguess)
     return agg_a
 end 
 
-function get_stable_dist(invdist, P,par)
+function get_stable_dist(invdist, P ,par)
     for iter in 1:par.maxits
         invdist2 = invdist * P
         if maximum(abs, invdist2 .- invdist) < 1e-9
@@ -207,12 +207,12 @@ end
 ## BLOCK 3 ##########################################################################
 
 ## Intermediate, do not touch, before the 25/11 session 
-# we just loop over 3 possible interest rates
-r_vec = [0.01, 0.02, 0.05]
+## we just loop over 3 possible interest rates
+r_int = [0.01, 0.02, 0.05]
 Vguess = zeros(Ns,Na)
-agg_a = zeros(length(r_vec))
+agg_a = zeros(length(r_int))
 
-for (ir,r) in enumerate(r_vec)
+for (ir,r) in enumerate(r_int)
 
     agg_a[ir] = aiyagari(r, par, agrid, sgrid,prob, Vguess) 
 
@@ -243,6 +243,7 @@ begin
 	function demand_k(r, par)
     	return (par.alpha / (r + par.delta))^(1 / (1 - par.alpha))
 	end
+
 
 	function find_eq_r(r_min, r_max, par, agrid, sgrid, prob, Vguess, agg_target)
     iter = 0
@@ -339,12 +340,19 @@ md"
 ### Bonus
 "
 
+# ╔═╡ f2dd215b-6e63-4432-affb-e5dab6dd399a
+md"
+This plot obviously has a problem. My guess something went wrong with the dimensionality somewhere. I tried rewriting the r-vector to avoid confusion, tried broadcasting and transposing inside the VFI loop, but I could not figure it out.
+"
+
 # ╔═╡ 60b0b328-e5f8-48e9-80dc-8c8a4e755d48
 begin
+	
+	dist = get_stable_dist_2(invdist, P ,par)
 
-    function compute_gini(agg_assets, dist)
+    function compute_gini(agg_a, dist)
         # Sort assets to calculate the Lorenz curve
-        sorted_assets = sort(agg_assets)
+        sorted_assets = sort(agg_a)
         
         # Compute cumulative sum of assets
         cumulative_assets = cumsum(sorted_assets)
@@ -386,6 +394,11 @@ begin
     gini = get_gini_from_distribution(agrid, dist)
     println("Gini Coefficient: $gini")
 end
+
+# ╔═╡ c0e426ab-ca25-4fde-88e6-436eb267583d
+md"
+How can I call the stable distribution from before? Because if I modify the output of the Aiyagari-function, the other parts of the code break down and I'm not sure how to rewrite it accordingly.
+"
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1611,6 +1624,8 @@ version = "1.4.1+1"
 # ╟─cc8dcaf1-a1f0-4092-a3e4-06be10112806
 # ╠═c9ed7650-2450-4345-83b6-b2bd36c0886a
 # ╟─1adb6b34-2699-49d5-8f8e-7d8523447e6a
+# ╟─f2dd215b-6e63-4432-affb-e5dab6dd399a
 # ╠═60b0b328-e5f8-48e9-80dc-8c8a4e755d48
+# ╟─c0e426ab-ca25-4fde-88e6-436eb267583d
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
